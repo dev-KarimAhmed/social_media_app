@@ -30,5 +30,7 @@ class GetDataFailureState extends SocialMediaUiState {
   final String error;
 
   GetDataFailureState(this.error);
-
 }
+
+class ChangeNavBottom extends SocialMediaUiState {}
+class NewPost extends SocialMediaUiState {}
