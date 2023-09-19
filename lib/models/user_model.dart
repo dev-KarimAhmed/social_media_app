@@ -10,7 +10,8 @@ class UserModel {
       required this.isEmailVerified,
       required this.image,
       required this.bio,
-      required this.cover});
+      required this.cover
+      });
 
   UserModel.fromJson(Map<String, dynamic>? json) {
     name = json!['name'];

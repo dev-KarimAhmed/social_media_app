@@ -5,6 +5,7 @@ import 'package:social_media_app/cubit/social_media_ui_state.dart';
 import 'package:social_media_app/main.dart';
 
 import '../models/user_model.dart';
+import 'edit_screen.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -138,7 +139,12 @@ class SettingsView extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfile()));
+                      },
                       icon: Icon(
                         Icons.edit,
                         color: Colors.blue,

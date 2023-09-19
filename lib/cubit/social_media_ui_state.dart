@@ -33,4 +33,21 @@ class GetDataFailureState extends SocialMediaUiState {
 }
 
 class ChangeNavBottom extends SocialMediaUiState {}
+
 class NewPost extends SocialMediaUiState {}
+
+class ProfileImagePickedSuccess extends SocialMediaUiState {}
+class ProfileImagePickedError extends SocialMediaUiState {}
+
+class CoverImagePickedSuccess extends SocialMediaUiState {}
+class CoverImagePickedError extends SocialMediaUiState {}
+
+class ProfileImageSuccessUpload extends SocialMediaUiState {}
+class ProfileImageErrorUpload extends SocialMediaUiState {}
+class CoverImageSuccessUpload extends SocialMediaUiState {}
+class CoverImageErrorUpload extends SocialMediaUiState {}
+
+class UpdateDataError extends SocialMediaUiState {}
+class UpdateDataSuccess extends SocialMediaUiState {}
+
+class UpdateDataLoading extends SocialMediaUiState {}

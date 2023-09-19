@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/cubit/social_media_ui_state.dart';
 
 import '../constants/constant.dart';
@@ -17,7 +21,7 @@ class AppCubit extends Cubit<SocialMediaUiState> {
   AppCubit() : super(SocialMediaUiInitial());
   static AppCubit get(context) => BlocProvider.of(context);
   bool isHidden = true;
-   UserModel? model;
+  UserModel? model;
 
   void hidePassword() {
     isHidden = !isHidden;
@@ -25,12 +29,10 @@ class AppCubit extends Cubit<SocialMediaUiState> {
   }
 
   void userRegister(
-      {
-      required String name,
+      {required String name,
       required String email,
       required String password,
-      required String phone
-      }) async {
+      required String phone}) async {
     emit(LoadingState());
     try {
       final credential =
@@ -40,11 +42,12 @@ class AppCubit extends Cubit<SocialMediaUiState> {
       );
       print(credential.user);
       createUser(
-          name: name,
-          email: email,
-          phone: phone,
-          uId: credential.user!.uid,
-          isEmailVerified: false);
+        name: name,
+        email: email,
+        phone: phone,
+        uId: credential.user!.uid,
+        isEmailVerified: false,
+      );
       emit(SuccessState(credential.user!.uid));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -75,13 +78,13 @@ class AppCubit extends Cubit<SocialMediaUiState> {
     }
   }
 
-  void createUser(
-      {
-        required String name,
-      required String email,
-      required String phone,
-      required String uId,
-      required bool isEmailVerified}) {
+  void createUser({
+    required String name,
+    required String email,
+    required String phone,
+    required String uId,
+    required bool isEmailVerified,
+  }) {
     UserModel userModel = UserModel(
         name: name,
         email: email,
@@ -89,9 +92,10 @@ class AppCubit extends Cubit<SocialMediaUiState> {
         uId: uId,
         isEmailVerified: isEmailVerified,
         bio: 'write your bio...',
-        cover: 'https://img.freepik.com/free-photo/courage-man-jump-through-gap-hill-business-concept-idea_1323-262.jpg?size=626&ext=jpg',
-        image: 'https://img.freepik.com/free-vector/illustration-businessman_53876-5856.jpg?size=626&ext=jpg'
-        );
+        cover:
+            'https://img.freepik.com/free-photo/courage-man-jump-through-gap-hill-business-concept-idea_1323-262.jpg?size=626&ext=jpg',
+        image:
+            'https://img.freepik.com/free-vector/illustration-businessman_53876-5856.jpg?size=626&ext=jpg');
 
     FirebaseFirestore.instance
         .collection('users')
@@ -125,14 +129,139 @@ class AppCubit extends Cubit<SocialMediaUiState> {
     SearchView(),
     SettingsView()
   ];
-  List<String> title = ['Home', 'Chat', 'Add Post' ,  'Search', 'Settings'];
+  List<String> title = ['Home', 'Chat', 'Add Post', 'Search', 'Settings'];
 
   void changeBottomNav(int index) {
     if (index == 2) {
       emit(NewPost());
     } else {
-    currentIndex = index;
-    emit(ChangeNavBottom());
+      currentIndex = index;
+      emit(ChangeNavBottom());
     }
+  }
+
+  File? profileImage;
+
+  Future pickedImageFromGallery() async {
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnImage != null) {
+      profileImage = File(returnImage.path);
+    } else {
+      return;
+    }
+    emit(ProfileImagePickedSuccess());
+  }
+
+  File? coverImage;
+  Future pickedImageCoverFromGallery() async {
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (returnImage != null) {
+      coverImage = File(returnImage.path);
+    } else {
+      return;
+    }
+
+    emit(ProfileImagePickedSuccess());
+  }
+
+  final storage = FirebaseStorage.instance;
+
+  void uploadProfileImage({
+    required String name,
+    required String bio,
+    required String phone,
+  }) {
+    emit(UpdateDataLoading());
+    storage
+        .ref()
+        .child('users/${Uri.file(profileImage!.path).pathSegments.last}')
+        .putFile(profileImage!)
+        .then((p0) {
+      p0.ref.getDownloadURL().then((value) {
+        updateUserData(
+          name: name,
+          bio: bio,
+          phone: phone,
+          image: value,
+        );
+      //  emit(ProfileImageSuccessUpload());
+      }).catchError((error) {
+        emit(ProfileImageErrorUpload());
+      });
+    }).catchError((error) {
+      emit(ProfileImageErrorUpload());
+    });
+  }
+
+  void uploadCoverImage({
+    required String name,
+    required String bio,
+    required String phone,
+  }) {
+    emit(UpdateDataLoading());
+    storage
+        .ref()
+        .child('users/${Uri.file(coverImage!.path).pathSegments.last}')
+        .putFile(coverImage!)
+        .then((p0) {
+      p0.ref.getDownloadURL().then((value) {
+        updateUserData(
+          name: name,
+          bio: bio,
+          phone: phone,
+          cover: value,
+        );
+        //emit(CoverImageSuccessUpload());
+      }).catchError((error) {
+        emit(CoverImageErrorUpload());
+      });
+    }).catchError((error) {
+      emit(CoverImageErrorUpload());
+    });
+  }
+
+  // void updateUserImages(
+  //     {required String name, required String bio, required String phone}) {
+  //   emit(UpdateDataLoading());
+  //   if (profileImage != null) {
+  //     uploadProfileImage();
+  //   } else if (profileImage != null) {
+  //     uploadCoverImage();
+  //   } else if (profileImage != null && profileImage != null) {
+  //   } else {
+  //     updateUserData(name: name, bio: bio, phone: phone);
+  //   }
+  // }
+
+  void updateUserData({
+    required String name,
+    required String bio,
+    required String phone,
+    String? image,
+    String? cover,
+  }) {
+    UserModel userModel = UserModel(
+      name: name,
+      phone: phone,
+      uId: uId,
+      isEmailVerified: false,
+      bio: bio,
+      cover: cover ?? model!.cover,
+      email: model!.email,
+      image: image ?? model!.image,
+    );
+    emit(UpdateDataSuccess());
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userModel.uId)
+        .update(userModel.toMap())
+        .then((value) {
+      getUserData();
+    }).catchError((error) {
+      emit(UpdateDataError());
+    });
   }
 }

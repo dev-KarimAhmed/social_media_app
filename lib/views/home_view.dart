@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/cubit/social_media_ui_cubit.dart';
@@ -21,13 +20,7 @@ class HomeView extends StatelessWidget {
       builder: (context, state) {
         var cubit = AppCubit.get(context);
         return Scaffold(
-          appBar: AppBar(
-            title: Text(cubit.title[cubit.currentIndex]),
-            actions: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.notifications)),
-              IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-            ],
-          ),
+          appBar: customAppBar(title: cubit.title[cubit.currentIndex]),
           body: cubit.screens[cubit.currentIndex],
           bottomNavigationBar: BottomNavigationBar(
               fixedColor: Colors.blue,
@@ -49,6 +42,16 @@ class HomeView extends StatelessWidget {
               ]),
         );
       },
+    );
+  }
+
+  AppBar customAppBar({required String title}) {
+    return AppBar(
+      title: Text(title),
+      actions: [
+        IconButton(onPressed: () {}, icon: Icon(Icons.notifications)),
+        IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+      ],
     );
   }
 }
