@@ -21,7 +21,7 @@ void main() async {
     MultiBlocProvider(
       providers: [
         BlocProvider<AppCubit>(create: (context) => AppCubit()),
-        BlocProvider<AppCubit>(create: (context) => AppCubit()..getUserData()),
+        BlocProvider<AppCubit>(create: (context) => AppCubit()..getUserData()..getPosts()),
       ],
        child: uId == null
         ? SocialMediaApp()

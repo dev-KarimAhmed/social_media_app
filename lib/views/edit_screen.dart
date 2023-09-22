@@ -5,6 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/cubit/social_media_ui_cubit.dart';
 
+import '../components/check_if_image_null_function.dart';
+import '../components/custom_actionBtn.dart';
+import '../components/custom_circleAvatr.dart';
+import '../components/custom_textFormField.dart';
 import '../cubit/social_media_ui_state.dart';
 
 class EditProfile extends StatelessWidget {
@@ -41,7 +45,7 @@ class EditProfile extends StatelessWidget {
               style: TextStyle(color: Colors.black),
             ),
             actions: [
-              GestureDetector(
+              CustomActionButton(
                 onTap: () {
                   AppCubit.get(context).updateUserData(
                     name: nameController.text,
@@ -49,16 +53,7 @@ class EditProfile extends StatelessWidget {
                     phone: phoneController.text,
                   );
                 },
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor),
-                  child: Text(
-                    'Update',
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ),
+                text: 'Update',
               ),
             ],
           ),
@@ -87,7 +82,7 @@ class EditProfile extends StatelessWidget {
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
                                       fit: BoxFit.cover,
-                                      image: imageCreateCover(coverImage),
+                                      image: coverImageUploadIfNull(coverImage),
                                     ),
                                     borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(8),
@@ -95,15 +90,12 @@ class EditProfile extends StatelessWidget {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.blue,
-                                  radius: 20,
-                                  child: IconButton(
-                                      onPressed: () {
-                                        AppCubit.get(context)
-                                            .pickedImageCoverFromGallery();
-                                      },
-                                      icon: Icon(Icons.camera_alt)),
+                                child: CustomCircleAvatar(
+                                  icon: Icons.camera_alt_rounded,
+                                  onPressed: () {
+                                    AppCubit.get(context)
+                                        .pickedImageCoverFromGallery();
+                                  },
                                 ),
                               )
                             ],
@@ -116,22 +108,18 @@ class EditProfile extends StatelessWidget {
                               radius: 54,
                               backgroundColor: Colors.white,
                               child: CircleAvatar(
-                                backgroundImage: imageCreate(profileImage),
+                                backgroundImage:
+                                    profileImageUploadIfNull(profileImage),
                                 radius: 50,
                               ),
                             ),
-                            CircleAvatar(
-                              backgroundColor: Colors.blue,
+                            CustomCircleAvatar(
+                              icon: Icons.camera_alt_rounded,
                               radius: 15,
-                              child: IconButton(
-                                  onPressed: () {
-                                    AppCubit.get(context)
-                                        .pickedImageFromGallery();
-                                  },
-                                  icon: Icon(
-                                    Icons.camera_alt,
-                                    size: 15,
-                                  )),
+                              size: 15,
+                              onPressed: () {
+                                AppCubit.get(context).pickedImageFromGallery();
+                              },
                             ),
                           ],
                         ),
@@ -164,14 +152,16 @@ class EditProfile extends StatelessWidget {
                                   ),
                                 ),
                                 if (state is UpdateDataLoading) ...[
-                                  SizedBox(height: 5,),
-                    LinearProgressIndicator(),
-                  ],
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  LinearProgressIndicator(),
+                                ],
                               ],
                             ),
                           ),
                         ],
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
                         if (AppCubit.get(context).coverImage != null) ...[
@@ -187,15 +177,17 @@ class EditProfile extends StatelessWidget {
                                       phone: phoneController.text,
                                     );
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     'UPLOAD COVER',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
-                                           if (state is UpdateDataLoading) ...[
-                                  SizedBox(height: 5,),
-                    LinearProgressIndicator(),
-                  ],
+                                if (state is UpdateDataLoading) ...[
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  const LinearProgressIndicator(),
+                                ],
                               ],
                             ),
                           ),
@@ -203,17 +195,16 @@ class EditProfile extends StatelessWidget {
                       ],
                     ),
                   ],
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
-
                   CustomTextFormField(
                     icon: Icons.person,
                     label: 'Name',
                     controller: nameController,
                     keyboardType: TextInputType.name,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   CustomTextFormField(
@@ -222,8 +213,7 @@ class EditProfile extends StatelessWidget {
                     controller: bioController,
                     keyboardType: TextInputType.name,
                   ),
-
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   CustomTextFormField(
@@ -238,57 +228,6 @@ class EditProfile extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-ImageProvider imageCreate(File? profileImage) {
-  if (profileImage == null) {
-    return NetworkImage(
-        'https://img.freepik.com/free-photo/shark-sea_181624-17254.jpg?size=626&ext=jpg');
-  } else {
-    return FileImage(profileImage);
-  }
-}
-
-ImageProvider imageCreateCover(File? coverImage) {
-  if (coverImage == null) {
-    return NetworkImage(
-        'https://img.freepik.com/premium-photo/sea-turtle-swims-along-coral-reefs-underwater-world-bali_508256-21.jpg?size=626&ext=jpg');
-  } else {
-    return FileImage(coverImage);
-  }
-}
-
-class CustomTextFormField extends StatelessWidget {
-  const CustomTextFormField({
-    super.key,
-    required this.label,
-    required this.icon,
-    this.controller,
-    this.keyboardType,
-  });
-  final String label;
-  final IconData icon;
-  final TextEditingController? controller;
-  final TextInputType? keyboardType;
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'This field is required';
-        } else {
-          return null;
-        }
-      },
-      keyboardType: keyboardType,
-      controller: controller,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        label: Text(label),
-        prefixIcon: Icon(icon),
-      ),
     );
   }
 }

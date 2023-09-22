@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:social_media_app/cubit/social_media_ui_cubit.dart';
 
+import '../components/custom_appBar.dart';
 import '../cubit/social_media_ui_state.dart';
 import 'new_post_view.dart';
 
@@ -13,6 +15,7 @@ class HomeView extends StatelessWidget {
     return BlocConsumer<AppCubit, SocialMediaUiState>(
       listener: (context, state) {
         if (state is NewPost) {
+          //when click to post 
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => NewPostScreen()));
         }
@@ -20,8 +23,10 @@ class HomeView extends StatelessWidget {
       builder: (context, state) {
         var cubit = AppCubit.get(context);
         return Scaffold(
-          appBar: customAppBar(title: cubit.title[cubit.currentIndex]),
+          appBar: customAppBar(
+              title: cubit.title[cubit.currentIndex], context: context),
           body: cubit.screens[cubit.currentIndex],
+          //Navigation bar 
           bottomNavigationBar: BottomNavigationBar(
               fixedColor: Colors.blue,
               unselectedItemColor: Colors.grey,
@@ -29,7 +34,7 @@ class HomeView extends StatelessWidget {
               onTap: (index) {
                 cubit.changeBottomNav(index);
               },
-              items: [
+              items: const[
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.message), label: 'Chat'),
@@ -42,16 +47,6 @@ class HomeView extends StatelessWidget {
               ]),
         );
       },
-    );
-  }
-
-  AppBar customAppBar({required String title}) {
-    return AppBar(
-      title: Text(title),
-      actions: [
-        IconButton(onPressed: () {}, icon: Icon(Icons.notifications)),
-        IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-      ],
     );
   }
 }

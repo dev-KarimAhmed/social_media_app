@@ -1,45 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/cubit/social_media_ui_cubit.dart';
+
+import '../components/custom_sperator.dart';
+import '../cubit/social_media_ui_state.dart';
+import '../models/post_model.dart';
 
 class NewsFeedView extends StatelessWidget {
   const NewsFeedView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        children: [
-          Card(
-            elevation: 10,
-            margin: EdgeInsets.all(8),
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            child: Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                Image(
-                  width: double.infinity,
-                  image: NetworkImage(
-                      'https://img.freepik.com/free-photo/cheerful-young-men-plaid-blue-shirts-white-t-shirts-colorful-pants-pose-orange-wall-great-mood-smile_197531-23466.jpg?size=626&ext=jpg'),
-                  fit: BoxFit.cover,
-                  height: 200,
+    return BlocConsumer<AppCubit, SocialMediaUiState>(
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        print(AppCubit.get(context).posts.length);
+        return Scaffold(
+          body: ListView(
+            children: [
+              Card(
+                elevation: 10,
+                margin: EdgeInsets.all(8),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Image(
+                      width: double.infinity,
+                      image: NetworkImage(
+                          'https://img.freepik.com/free-photo/cheerful-young-men-plaid-blue-shirts-white-t-shirts-colorful-pants-pose-orange-wall-great-mood-smile_197531-23466.jpg?size=626&ext=jpg'),
+                      fit: BoxFit.cover,
+                      height: 200,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Communicate with friends',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    )
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Communicate with friends',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                )
-              ],
-            ),
+              ),
+              AppCubit.get(context).posts.isNotEmpty
+                  ? ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) => PostItem(
+                          model: AppCubit.get(context).posts[index],
+                          index: index),
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 10),
+                      itemCount: AppCubit.get(context).posts.length)
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    )
+            ],
           ),
-          ListView.separated(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) => PostItem(),
-              separatorBuilder: (context, index) => SizedBox(height: 10),
-              itemCount: 10)
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -47,8 +68,11 @@ class NewsFeedView extends StatelessWidget {
 class PostItem extends StatelessWidget {
   const PostItem({
     super.key,
+    required this.model,
+    required this.index,
   });
-
+  final PostModel model;
+  final int index;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -65,7 +89,7 @@ class PostItem extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       backgroundImage: NetworkImage(
-                          'https://img.freepik.com/free-photo/male-striped-coat-walking-field-with-tall-grass-near-sea_181624-3652.jpg?size=626&ext=jpg'),
+                          'https://img.freepik.com/free-vector/illustration-businessman_53876-5856.jpg?size=626&ext=jpg'),
                       radius: 25,
                     ),
                     SizedBox(
@@ -77,7 +101,7 @@ class PostItem extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text('Karim Ahmed'),
+                            Text(model.name!),
                             SizedBox(width: 5),
                             Icon(
                               Icons.check_circle,
@@ -87,7 +111,7 @@ class PostItem extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          'Septemper 16, 2023 at 1:48 am',
+                          model.dateTime!,
                           style: Theme.of(context).textTheme.bodySmall,
                         )
                       ],
@@ -96,97 +120,98 @@ class PostItem extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                child: Container(
-                  width: double.infinity,
-                  height: 1,
-                  color: Colors.grey[300],
+              CustomSperator(),
+              Row(
+                children: [
+                  Text(
+                    model.postText ?? '',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ],
+              ),
+              // Container(
+              //   padding: EdgeInsets.symmetric(vertical: 10),
+              //   width: double.infinity,
+              //   child: Wrap(
+              //     children: [
+              //       Padding(
+              //         padding: const EdgeInsetsDirectional.only(end: 6),
+              //         child: SizedBox(
+              //           height: 20,
+              //           child: MaterialButton(
+              //             minWidth: 1,
+              //             padding: EdgeInsets.zero,
+              //             onPressed: () {},
+              //             child: Text(
+              //               '#software',
+              //               style: TextStyle(color: Colors.blue),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       Padding(
+              //         padding: const EdgeInsetsDirectional.only(end: 6),
+              //         child: SizedBox(
+              //           height: 20,
+              //           child: MaterialButton(
+              //             minWidth: 1,
+              //             padding: EdgeInsets.zero,
+              //             onPressed: () {},
+              //             child: Text(
+              //               '#software',
+              //               style: TextStyle(color: Colors.blue),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       Padding(
+              //         padding: const EdgeInsetsDirectional.only(end: 6),
+              //         child: SizedBox(
+              //           height: 20,
+              //           child: MaterialButton(
+              //             minWidth: 1,
+              //             padding: EdgeInsets.zero,
+              //             onPressed: () {},
+              //             child: Text(
+              //               '#flutter',
+              //               style: TextStyle(color: Colors.blue),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       Padding(
+              //         padding: const EdgeInsetsDirectional.only(end: 6),
+              //         child: SizedBox(
+              //           height: 20,
+              //           child: MaterialButton(
+              //             minWidth: 1,
+              //             padding: EdgeInsets.zero,
+              //             onPressed: () {},
+              //             child: Text(
+              //               '#software_development',
+              //               style: TextStyle(color: Colors.blue),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              if (model.postImage != '') ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Container(
+                    height: 140,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(model.postImage!),
+                        )),
+                  ),
                 ),
-              ),
-              Text(
-                'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently ',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                width: double.infinity,
-                child: Wrap(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 6),
-                      child: SizedBox(
-                        height: 20,
-                        child: MaterialButton(
-                          minWidth: 1,
-                          padding: EdgeInsets.zero,
-                          onPressed: () {},
-                          child: Text(
-                            '#software',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 6),
-                      child: SizedBox(
-                        height: 20,
-                        child: MaterialButton(
-                          minWidth: 1,
-                          padding: EdgeInsets.zero,
-                          onPressed: () {},
-                          child: Text(
-                            '#software',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 6),
-                      child: SizedBox(
-                        height: 20,
-                        child: MaterialButton(
-                          minWidth: 1,
-                          padding: EdgeInsets.zero,
-                          onPressed: () {},
-                          child: Text(
-                            '#flutter',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 6),
-                      child: SizedBox(
-                        height: 20,
-                        child: MaterialButton(
-                          minWidth: 1,
-                          padding: EdgeInsets.zero,
-                          onPressed: () {},
-                          child: Text(
-                            '#software_development',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 140,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(
-                          'https://img.freepik.com/free-photo/cheerful-young-men-plaid-blue-shirts-white-t-shirts-colorful-pants-pose-orange-wall-great-mood-smile_197531-23466.jpg?size=626&ext=jpg'),
-                    )),
-              ),
+              ],
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Row(
@@ -203,7 +228,7 @@ class PostItem extends StatelessWidget {
                             width: 5,
                           ),
                           Text(
-                            '1200',
+                            '${AppCubit.get(context).likes[index]}',
                             style: Theme.of(context).textTheme.bodySmall,
                           )
                         ],
@@ -222,7 +247,7 @@ class PostItem extends StatelessWidget {
                             width: 5,
                           ),
                           Text(
-                            '120 comment',
+                            '0 comment',
                             style: Theme.of(context).textTheme.bodySmall,
                           )
                         ],
@@ -246,7 +271,7 @@ class PostItem extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             backgroundImage: NetworkImage(
-                                'https://img.freepik.com/free-photo/male-striped-coat-walking-field-with-tall-grass-near-sea_181624-3652.jpg?size=626&ext=jpg'),
+                                AppCubit.get(context).model?.image ?? ''),
                             radius: 15,
                           ),
                           SizedBox(
@@ -261,7 +286,10 @@ class PostItem extends StatelessWidget {
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          AppCubit.get(context)
+                              .likePost(AppCubit.get(context).postsID[index]);
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -289,3 +317,4 @@ class PostItem extends StatelessWidget {
         ));
   }
 }
+
