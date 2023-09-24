@@ -126,16 +126,30 @@ class AppCubit extends Cubit<SocialMediaUiState> {
 
   // Function to get the data of the user to show UX different according each user
   // you should call it firstly in main with its cubit provider
-  void getUserData() {
-    emit(GetDataLoadingState());
-    FirebaseFirestore.instance.collection('users').doc(uId).get().then((value) {
-      print('Your data is ${value.data()}');
-      model = UserModel.fromJson(value.data());
+  // void getUserData() {
+  //   emit(GetDataLoadingState());
+  //   FirebaseFirestore.instance.collection('users').doc(uId).get().then((value) {
+  //     print('Your data is ${value.data()}');
+  //     model = UserModel.fromJson(value.data());
+  //     emit(GetDataSuccessState());
+  //   }).catchError((error) {
+  //     print(error.toString());
+  //     emit(GetDataFailureState(error.toString()));
+  //   });
+  // }
+  Future<void> getUserData() async {
+    try {
+      emit(GetDataLoadingState());
+      final documentSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uId).get();
+
+      print('Your data is ${documentSnapshot.data()}');
+      model = UserModel.fromJson(documentSnapshot.data());
       emit(GetDataSuccessState());
-    }).catchError((error) {
+    } catch (error) {
       print(error.toString());
       emit(GetDataFailureState(error.toString()));
-    });
+    }
   }
 
   // variables for the navigationBar
@@ -371,10 +385,14 @@ class AppCubit extends Cubit<SocialMediaUiState> {
   List<PostModel> posts = [];
   List<String> postsID = [];
   List<int> likes = [];
+
+  // Function to get posts (all post)
   Future<void> getPosts() async {
-    posts = [];
     try {
-      final postsCollection = FirebaseFirestore.instance.collection('posts').orderBy('dateTime');
+      posts = [];
+      likes = [];
+      final postsCollection =
+          FirebaseFirestore.instance.collection('posts').orderBy('dateTime');
       final postsQuery = await postsCollection.get();
 
       for (var element in postsQuery.docs) {
@@ -382,13 +400,14 @@ class AppCubit extends Cubit<SocialMediaUiState> {
         likes.add(likesQuery.docs.length);
         postsID.add(element.id);
         posts.add(PostModel.fromJson(element.data()));
-        emit(GetPostsSuccess());
       }
+      emit(GetPostsSuccess());
     } catch (error) {
       emit(GetPostsError(error.toString()));
     }
   }
 
+ // Function to get all users in the chat screen
   List<UserModel> allUsers = [];
   Future<void> getAllUsers() async {
     if (allUsers.isEmpty) {
@@ -424,19 +443,34 @@ class AppCubit extends Cubit<SocialMediaUiState> {
   //   });
   // }
 
-  void likePost(String postId) {
-    FirebaseFirestore.instance
-        .collection('posts')
-        .doc(postId)
-        .collection('likes')
-        .doc(model!.uId)
-        .set({'like': true}).then((value) {
+  // void likePost(String postId) {
+  //   FirebaseFirestore.instance
+  //       .collection('posts')
+  //       .doc(postId)
+  //       .collection('likes')
+  //       .doc(model!.uId)
+  //       .set({'like': false}).then((value) {
+  //     getUserData();
+  //     emit(LikeSuccess());
+  //   }).catchError((error) {
+  //     emit(LikeError());
+  //   });
+  // }
+  Future<void> likePost(String postId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .collection('likes')
+          .doc(model!.uId)
+          .set({'like': true});
       emit(LikeSuccess());
-    }).catchError((error) {
+    } catch (error) {
       emit(LikeError());
-    });
+    }
   }
 
+  
   void sendMessage({
     required String receiverID,
     required String dateTime,
@@ -498,5 +532,16 @@ class AppCubit extends Cubit<SocialMediaUiState> {
       }
       emit(GetMessagesSuccess());
     });
+  }
+
+  Future<void> deletePost({required String postId}) async {
+    emit(PostDeletedLoading());
+    try {
+      await FirebaseFirestore.instance.collection('posts').doc(postId).delete();
+      await getPosts();
+      emit(PostDeletedSuccess());
+    } catch (e) {
+      emit(PostDeletedError());
+    }
   }
 }

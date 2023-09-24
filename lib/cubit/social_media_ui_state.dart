@@ -104,3 +104,7 @@ class SendMessageError extends SocialMediaUiState {
 
 class GetMessagesSuccess extends SocialMediaUiState {}
 class GetMessagesLoading extends SocialMediaUiState {}
+
+class PostDeletedLoading extends SocialMediaUiState {}
+class PostDeletedSuccess extends SocialMediaUiState {}
+class PostDeletedError extends SocialMediaUiState {}

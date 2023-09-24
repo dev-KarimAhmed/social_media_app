@@ -33,7 +33,8 @@ void main() async {
       BlocProvider<AppCubit>(
           create: (context) => AppCubit()
             ..getUserData()
-            ..getPosts()),
+            ..getPosts(),
+            ),
     ],
     child: uId == null
         ? SocialMediaApp()
