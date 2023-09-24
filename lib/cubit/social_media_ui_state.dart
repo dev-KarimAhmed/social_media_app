@@ -79,6 +79,7 @@ class GetPostsError extends SocialMediaUiState {
 }
 
 class LikeSuccess extends SocialMediaUiState {}
+
 class LikeError extends SocialMediaUiState {}
 
 class GetUsersLoading extends SocialMediaUiState {}
@@ -90,6 +91,7 @@ class GetUsersError extends SocialMediaUiState {
 
   GetUsersError(this.error);
 }
+
 class SendMessageLoading extends SocialMediaUiState {}
 
 class SendMessageSuccess extends SocialMediaUiState {}
@@ -99,3 +101,6 @@ class SendMessageError extends SocialMediaUiState {
 
   SendMessageError(this.error);
 }
+
+class GetMessagesSuccess extends SocialMediaUiState {}
+class GetMessagesLoading extends SocialMediaUiState {}

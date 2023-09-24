@@ -440,7 +440,7 @@ class AppCubit extends Cubit<SocialMediaUiState> {
       dateTime: dateTime,
       text: text,
     );
-    
+
     // set my chats
     FirebaseFirestore.instance
         .collection('users')
@@ -450,7 +450,7 @@ class AppCubit extends Cubit<SocialMediaUiState> {
         .collection('messages')
         .add(messageModel.toMap())
         .then((value) {
-          print('Sent================1');
+      print('Sent================1');
       emit(SendMessageSuccess());
     }).catchError((error) {
       emit(SendMessageError(error.toString()));
@@ -465,10 +465,31 @@ class AppCubit extends Cubit<SocialMediaUiState> {
         .collection('messages')
         .add(messageModel.toMap())
         .then((value) {
-          print('Sent================2');
+      print('Sent================2');
       emit(SendMessageSuccess());
     }).catchError((error) {
       emit(SendMessageError(error.toString()));
     });
   }
+
+  List<MessageModel> messages = [];
+
+  void getMessages({required String receiverId}) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(model!.uId)
+        .collection('chats')
+        .doc(receiverId)
+        .collection('messages')
+        .orderBy('dateTime')
+        .snapshots()
+        .listen((event) {
+      messages = [];
+      for (var element in event.docs) {
+        messages.add(MessageModel.fromJson(element.data()));
+      }
+      emit(GetMessagesSuccess());
+    });
+  }
+
 }
