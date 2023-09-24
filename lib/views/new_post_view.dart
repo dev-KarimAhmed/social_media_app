@@ -39,6 +39,7 @@ class NewPostScreen extends StatelessWidget {
                     AppCubit.get(context).createNewPost(
                         dateTime: DateTime.now().toString(),
                         postText: postController.text);
+                    Navigator.pop(context);
                   } else {
                     AppCubit.get(context).uploadPostImage(
                         dateTime: DateTime.now().toString(),

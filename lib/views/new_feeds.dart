@@ -53,7 +53,8 @@ class NewsFeedView extends StatelessWidget {
                           index: index),
                       separatorBuilder: (context, index) =>
                           SizedBox(height: 10),
-                      itemCount: AppCubit.get(context).posts.length)
+                      itemCount: AppCubit.get(context).posts.length,
+                      )
                   : Center(
                       child: CircularProgressIndicator(),
                     )
@@ -129,74 +130,7 @@ class PostItem extends StatelessWidget {
                   ),
                 ],
               ),
-              // Container(
-              //   padding: EdgeInsets.symmetric(vertical: 10),
-              //   width: double.infinity,
-              //   child: Wrap(
-              //     children: [
-              //       Padding(
-              //         padding: const EdgeInsetsDirectional.only(end: 6),
-              //         child: SizedBox(
-              //           height: 20,
-              //           child: MaterialButton(
-              //             minWidth: 1,
-              //             padding: EdgeInsets.zero,
-              //             onPressed: () {},
-              //             child: Text(
-              //               '#software',
-              //               style: TextStyle(color: Colors.blue),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Padding(
-              //         padding: const EdgeInsetsDirectional.only(end: 6),
-              //         child: SizedBox(
-              //           height: 20,
-              //           child: MaterialButton(
-              //             minWidth: 1,
-              //             padding: EdgeInsets.zero,
-              //             onPressed: () {},
-              //             child: Text(
-              //               '#software',
-              //               style: TextStyle(color: Colors.blue),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Padding(
-              //         padding: const EdgeInsetsDirectional.only(end: 6),
-              //         child: SizedBox(
-              //           height: 20,
-              //           child: MaterialButton(
-              //             minWidth: 1,
-              //             padding: EdgeInsets.zero,
-              //             onPressed: () {},
-              //             child: Text(
-              //               '#flutter',
-              //               style: TextStyle(color: Colors.blue),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Padding(
-              //         padding: const EdgeInsetsDirectional.only(end: 6),
-              //         child: SizedBox(
-              //           height: 20,
-              //           child: MaterialButton(
-              //             minWidth: 1,
-              //             padding: EdgeInsets.zero,
-              //             onPressed: () {},
-              //             child: Text(
-              //               '#software_development',
-              //               style: TextStyle(color: Colors.blue),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
+              
               if (model.postImage != '') ...[
                 Padding(
                   padding: const EdgeInsets.only(top: 16),

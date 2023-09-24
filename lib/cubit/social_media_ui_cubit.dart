@@ -176,7 +176,7 @@ class AppCubit extends Cubit<SocialMediaUiState> {
     emit(ProfileImagePickedSuccess());
   }
 
-  // Function to pick an image from your gallery for profile (imagePicker package)
+  // Function to pick an image from your gallery for cover (imagePicker package)
   File? coverImage;
   Future pickedImageCoverFromGallery() async {
     final returnImage =
@@ -292,6 +292,7 @@ class AppCubit extends Cubit<SocialMediaUiState> {
     });
   }
 
+  // Function to pick an image from your gallery for post (imagePicker package)
   File? postImage;
   Future pickedPostImageFromGallery() async {
     final returnImage =
@@ -306,11 +307,13 @@ class AppCubit extends Cubit<SocialMediaUiState> {
     emit(PostImagePickedSuccess());
   }
 
+  //Function to remove the post image
   void removePostImage() {
     postImage = null;
     emit(PostImagePickedRemoveSuccess());
   }
 
+  // Fucntion to upload the post image in the storage of Firebase
   void uploadPostImage({
     required String dateTime,
     required String postText,
@@ -336,12 +339,14 @@ class AppCubit extends Cubit<SocialMediaUiState> {
     });
   }
 
+  //Function to create a new post with the post model
   void createNewPost({
     required String dateTime,
     required String postText,
     String? postImage,
   }) {
     emit(PostCreateLoading());
+    // create and intialize object of PostModel class
     PostModel postModel = PostModel(
       name: model!.name,
       dateTime: dateTime,
@@ -350,12 +355,14 @@ class AppCubit extends Cubit<SocialMediaUiState> {
       profileImage: model!.image,
       postImage: postImage ?? '',
     );
-    // emit(PostCreateSuccess());
+
+    //upload or create a collection in the firebase for the posts
     FirebaseFirestore.instance
         .collection('posts')
         .add(postModel.toMap())
         .then((value) {
-      getUserData();
+      getPosts();
+      emit(PostCreateSuccess());
     }).catchError((error) {
       emit(PostCreateError());
     });
@@ -365,8 +372,9 @@ class AppCubit extends Cubit<SocialMediaUiState> {
   List<String> postsID = [];
   List<int> likes = [];
   Future<void> getPosts() async {
+    posts = [];
     try {
-      final postsCollection = FirebaseFirestore.instance.collection('posts');
+      final postsCollection = FirebaseFirestore.instance.collection('posts').orderBy('dateTime');
       final postsQuery = await postsCollection.get();
 
       for (var element in postsQuery.docs) {
@@ -374,8 +382,8 @@ class AppCubit extends Cubit<SocialMediaUiState> {
         likes.add(likesQuery.docs.length);
         postsID.add(element.id);
         posts.add(PostModel.fromJson(element.data()));
+        emit(GetPostsSuccess());
       }
-      emit(GetPostsSuccess());
     } catch (error) {
       emit(GetPostsError(error.toString()));
     }
@@ -491,5 +499,4 @@ class AppCubit extends Cubit<SocialMediaUiState> {
       emit(GetMessagesSuccess());
     });
   }
-
 }
